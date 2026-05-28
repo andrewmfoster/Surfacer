@@ -1,0 +1,9 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "tray",
+  "description": "Least-privilege capability for the tray popover window. Its only built-in need is listening for board-changed; it drives all data through custom #[tauri::command]s (get_board, save_card, complete_card, trash_card, save_project, open_project_in_main, close_tray, quit_app), which are not capability-gated. Image thumbnails use convertFileSrc, governed by app.security.assetProtocol.scope, not a capability.",
+  "windows": ["tray"],
+  "permissions": [
+    "core:event:default"
+  ]
+}

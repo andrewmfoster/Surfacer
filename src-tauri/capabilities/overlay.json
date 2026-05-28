@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "overlay",
+  "description": "Least-privilege capability for the screenshot overlay panel. Built-in needs: listen for overlay-data, and drag the panel by its header (data-tauri-drag-region). Routing/dismiss go through custom #[tauri::command]s (overlay_route, overlay_dismiss), which are not capability-gated.",
+  "windows": ["overlay"],
+  "permissions": [
+    "core:event:default",
+    "core:window:allow-start-dragging"
+  ]
+}

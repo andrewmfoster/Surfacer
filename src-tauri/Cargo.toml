@@ -1,0 +1,47 @@
+[package]
+name = "surfacer"
+version = "1.0.0"
+description = "Personal project tracker"
+authors = ["Andrew Foster"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "surfacer_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["protocol-asset", "tray-icon", "macos-private-api"] }
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-autostart = "2"
+tauri-plugin-single-instance = "2"
+tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2.1" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.40.0", features = ["bundled"] }
+uuid = { version = "1.23.1", features = ["v4"] }
+# Screenshot watcher (Shell D). Debouncer wraps `notify` and coalesces FSEvents
+# bursts — macOS fires Create+Modify when an app finishes writing a screenshot.
+notify-debouncer-mini = "0.6"
+# PNG resize for overlay thumbnails. default-features = false drops jpeg/gif/webp
+# decoders we don't need; png is the only screenshot format macOS produces.
+image = { version = "0.25", default-features = false, features = ["png"] }
+base64 = "0.22"
+
+[profile.release]
+# Strip the symbol table + debug info from the shipped binary — smaller bundle.
+# NOTE: strip removes *symbols*, not embedded string data. The build-machine
+# path/username leak (/Users/<name>/.cargo/... baked into panic-location
+# strings) is closed separately by `--remap-path-prefix` in .cargo/config.toml
+# (gitignored, local-only — Cargo's stable `trim-paths` profile option is not
+# yet stabilized on this toolchain). Security audit pass 2, 2026-05-29.
+strip = true
+
