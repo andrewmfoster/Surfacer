@@ -1,0 +1,195 @@
+/* Screenshot routing overlay. Sized to the 320×420 overlay window from
+   tauri.conf.json. */
+
+body:has(#overlay-root) {
+  width: 320px;
+  height: 420px;
+  overflow: hidden;
+  background: transparent;
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+#overlay-root,
+#overlay-root * {
+  box-sizing: border-box;
+}
+
+#overlay-root {
+  width: 320px;
+  height: 420px;
+}
+
+#overlay-card {
+  width: 320px;
+  height: 420px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(11, 15, 28, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  overflow: hidden;
+  /* No CSS box-shadow: this is a transparent window, so WebKit clips the soft
+     rounded shadow to the window's rectangular bounds, leaving a hard
+     rectangular halo around the rounded card. (`shadow: false` in
+     tauri.conf.json only governs the macOS *window* shadow, not CSS.) Depth,
+     if wanted, must come from the native window shadow. See CLAUDE.md. */
+}
+
+/* ── HEADER ── */
+#overlay-header {
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.overlay-header-icon { color: rgba(255, 255, 255, 0.3); flex-shrink: 0; }
+
+#overlay-header-label {
+  flex: 1;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+#overlay-dismiss-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 5px;
+  transition: color 0.14s, background 0.14s;
+}
+#overlay-dismiss-btn:hover {
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* ── THUMBNAIL ── */
+#overlay-thumb-wrap {
+  flex-shrink: 0;
+  height: 166px;
+  padding: 10px 12px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#overlay-thumb {
+  max-width: 296px;
+  max-height: 150px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  object-fit: contain;
+  display: block;
+}
+
+/* ── ROUTE LABEL ── */
+#overlay-route-label {
+  flex-shrink: 0;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+}
+
+/* ── PROJECTS ── */
+#overlay-projects {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 8px;
+  scrollbar-width: none;
+}
+#overlay-projects::-webkit-scrollbar { display: none; }
+
+.overlay-project-btn {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 8px;
+  border-radius: 7px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+.overlay-project-btn:hover  { background: rgba(255, 255, 255, 0.07); }
+.overlay-project-btn:active { background: rgba(255, 255, 255, 0.04); }
+
+.overlay-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.overlay-project-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.overlay-project-status {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── FOOTER ── */
+#overlay-footer {
+  flex-shrink: 0;
+  height: 34px;
+  padding: 8px 14px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#overlay-progress-track {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+#overlay-progress-fill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 1px;
+  transition: width 1s linear;
+}
+
+#overlay-countdown-text {
+  margin-top: 5px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.18);
+  text-align: right;
+  font-weight: 500;
+}
