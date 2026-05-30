@@ -1,0 +1,20 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* No body background here — App.css and TrayApp.css set their own.
+     The tray view needs body to stay fully transparent so the wallpaper
+     shows through the .tray-panel's rounded corners and the edge gap;
+     putting a default #060a14 here was bleeding through as a faint
+     rectangular halo around the tray popover. */
+}
+
+#root {
+  height: 100%;
+}
