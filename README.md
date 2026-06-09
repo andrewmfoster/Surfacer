@@ -2,16 +2,6 @@
   <img src="assets/banner.png" alt="Surfacer — one surface for every project you're juggling" width="100%">
 </p>
 
-<h1 align="center">Surfacer</h1>
-
-<p align="center">
-  <strong>Personal project tracker for macOS. One surface for every project you're juggling — cards, screenshots, status, tags — that follows you across your OS.</strong>
-</p>
-
-<p align="center">
-  <em>A vibe-coded macOS app, built end-to-end with (ample) help from Claude Code</em>
-</p>
-
 <p align="center">
   <img src="https://img.shields.io/badge/macOS-12%2B-111?logo=apple&logoColor=white" alt="macOS 12+">
   <img src="https://img.shields.io/badge/Apple%20Silicon-arm64-555?logo=apple&logoColor=white" alt="Apple Silicon">
