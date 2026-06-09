@@ -1,0 +1,84 @@
+<!doctype html>
+<!--
+  Source for assets/banner.png — the README hero + GitHub social-preview image.
+  Re-render (from this assets/ directory) with:
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless=new --disable-gpu --hide-scrollbars --allow-file-access-from-files \
+      --force-device-scale-factor=2 --window-size=1280,640 \
+      --default-background-color=00000000 --virtual-time-budget=4000 \
+      --screenshot=banner@2x.png "file://$PWD/banner.src.html"
+    sips -z 640 1280 banner@2x.png --out banner.png   # → crisp 1280x640, <1MB
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1280px; height: 640px; }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    background: #0b0f1c; color: rgba(255,255,255,0.92); overflow: hidden; position: relative;
+  }
+
+  /* mesh-gradient glow, echoing the app's MeshGradient (status accents) */
+  .mesh {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(680px 520px at 6% -8%,  rgba(184,68,40,0.42), transparent 60%),
+      radial-gradient(720px 560px at 96% 112%, rgba(74,104,204,0.40), transparent 62%),
+      radial-gradient(520px 480px at 84% -12%, rgba(56,88,154,0.30), transparent 60%),
+      radial-gradient(600px 600px at -6% 108%, rgba(136,152,184,0.16), transparent 60%);
+    filter: saturate(1.05);
+  }
+  .grain { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,15,28,0) 40%, rgba(6,9,18,0.55) 100%); }
+
+  .stage { position: relative; width: 100%; height: 100%; display: flex; align-items: center; }
+
+  .left { width: 560px; flex-shrink: 0; padding: 0 0 0 84px; display: flex; flex-direction: column; z-index: 3; }
+  .brandrow { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+  .icon { width: 92px; height: 92px; border-radius: 21px; box-shadow: 0 12px 40px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.10); }
+  .wordmark { font-size: 70px; font-weight: 800; letter-spacing: -0.025em; line-height: 1; }
+  .tagline { font-size: 31px; font-weight: 700; line-height: 1.22; letter-spacing: -0.015em; color: #fff; margin-bottom: 18px; max-width: 470px; }
+  .sub { font-size: 17.5px; font-weight: 500; line-height: 1.5; color: rgba(255,255,255,0.52); max-width: 430px; margin-bottom: 34px; }
+  .dots { display: flex; gap: 22px; margin-bottom: 40px; }
+  .dot { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+  .dot i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .foot { display: flex; align-items: center; gap: 14px; }
+  .pill { font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,0.66); padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.13); background: rgba(255,255,255,0.035); }
+  .vibe { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.40); }
+
+  .right { position: absolute; right: -70px; top: 50%; transform: translateY(-50%) rotate(-4deg); z-index: 2; }
+  .shot { width: 760px; height: auto; display: block; border-radius: 16px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04); }
+  .fade-right { position: absolute; top: 0; right: 0; width: 180px; height: 100%; background: linear-gradient(90deg, transparent, #0b0f1c 92%); z-index: 4; }
+</style>
+</head>
+<body>
+  <div class="mesh"></div>
+  <div class="grain"></div>
+  <div class="stage">
+    <div class="right"><img class="shot" src="./bulletin-hero.png" alt=""></div>
+    <div class="fade-right"></div>
+    <div class="left">
+      <div class="brandrow">
+        <img class="icon" src="./icon.png" alt="">
+        <div class="wordmark">Surfacer</div>
+      </div>
+      <div class="tagline">One surface for every project you&rsquo;re juggling.</div>
+      <div class="sub">A macOS board of cards, screenshots, status and tags &mdash; that follows you across your OS, including over full-screen apps.</div>
+      <div class="dots">
+        <span class="dot"><i style="background:#b84428"></i>Active</span>
+        <span class="dot"><i style="background:#4a68cc"></i>Paused</span>
+        <span class="dot"><i style="background:#38589a"></i>Shipped</span>
+        <span class="dot"><i style="background:#8898b8"></i>Idea</span>
+      </div>
+      <div class="foot">
+        <span class="pill">Rust &middot; Tauri 2 &middot; React</span>
+        <span class="vibe">Vibe-coded with Claude Code</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

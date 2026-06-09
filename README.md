@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.png" width="128" height="128" alt="Surfacer">
+  <img src="assets/banner.png" alt="Surfacer — one surface for every project you're juggling" width="100%">
 </p>
 
 <h1 align="center">Surfacer</h1>
