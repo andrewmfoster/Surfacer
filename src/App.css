@@ -40,7 +40,7 @@ body:has(.app) {
   display: flex;
   flex-direction: row;
   height: 100%;
-  min-width: 620px;
+  min-width: 520px;
   background: transparent;
   position: relative;
   z-index: 1;
@@ -1667,7 +1667,7 @@ body:has(.app) {
 
 .modal--settings {
   width: 480px;
-  max-width: 480px;
+  max-width: calc(100vw - var(--sidebar-w) - 48px);
   max-height: 80vh;
   align-self: center;
 }
