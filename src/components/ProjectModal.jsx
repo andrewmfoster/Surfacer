@@ -44,8 +44,9 @@ function ModalTitle({ value, onChange }) {
 export default function ProjectModal({
   project, tags, onClose,
   updateProject, addCard, addImageCard, updateCard, deleteCard, restoreCard, hardDeleteCard,
-  reorderCards, toggleCardComplete,
+  reorderCards, moveCard, toggleCardComplete,
   setProjectStatus, setProjectTags, createTag, deleteTag,
+  allProjects,
 }) {
   const [newText, setNewText] = useState('')
   const [adding, setAdding] = useState(false)
@@ -89,6 +90,7 @@ export default function ProjectModal({
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 250, tolerance: 5 } }))
 
+  const moveTargets = (allProjects ?? []).filter(p => p.id !== project.id).map(p => ({ id: p.id, title: p.title }))
   const activeCards = project.cards.filter(c => !c.completed && !c.deleted)
   const completedCards = project.cards.filter(c => c.completed && !c.deleted)
   const deletedCards = project.cards.filter(c => c.deleted)
@@ -228,6 +230,8 @@ export default function ProjectModal({
                   onUpdate={text => updateCard(project.id, card.id, text)}
                   onDelete={() => deleteCard(project.id, card.id)}
                   onToggleComplete={() => toggleCardComplete(project.id, card.id)}
+                  moveTargets={moveTargets}
+                  onMove={pid => moveCard(project.id, card.id, pid)}
                 />
               ))}
             </SortableContext>
@@ -251,6 +255,8 @@ export default function ProjectModal({
                       onUpdate={text => updateCard(project.id, card.id, text)}
                       onDelete={() => deleteCard(project.id, card.id)}
                       onToggleComplete={() => toggleCardComplete(project.id, card.id)}
+                      moveTargets={moveTargets}
+                      onMove={pid => moveCard(project.id, card.id, pid)}
                     />
                   ))}
                 </div>

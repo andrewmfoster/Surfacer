@@ -234,7 +234,7 @@ export default function App() {
           reorderDisabled={hasFilters}
         />
       ) : (
-        <Board {...board} projects={filteredProjects} reorderDisabled={hasFilters} />
+        <Board {...board} projects={filteredProjects} allProjects={board.projects} reorderDisabled={hasFilters} />
       )}
 
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
@@ -254,11 +254,13 @@ export default function App() {
             restoreCard={board.restoreCard}
             hardDeleteCard={board.hardDeleteCard}
             reorderCards={board.reorderCards}
+            moveCard={board.moveCard}
             toggleCardComplete={board.toggleCardComplete}
             setProjectStatus={board.setProjectStatus}
             setProjectTags={board.setProjectTags}
             createTag={board.createTag}
             deleteTag={board.deleteTag}
+            allProjects={board.projects}
           />
         ) : null
       })()}

@@ -383,6 +383,36 @@ export function useBoard() {
     mutate(api.reorderCards(newCards.map(c => c.id)), 'reorderCards')
   }
 
+  const moveCard = (fromProjectId, cardId, toProjectId) => {
+    if (fromProjectId === toProjectId) return
+    const source = projectsRef.current.find(p => p.id === fromProjectId)
+    const card = source?.cards.find(c => c.id === cardId)
+    if (!card) return
+    const target = projectsRef.current.find(p => p.id === toProjectId)
+    if (!target) return
+    const sort_order = nextCardSortOrder(target.cards)
+
+    pushUndo(() => {
+      const from = projectsRef.current.find(p => p.id === toProjectId)
+      const moved = from?.cards.find(c => c.id === cardId)
+      if (!moved) return
+      const backOrder = nextCardSortOrder((projectsRef.current.find(p => p.id === fromProjectId)?.cards) ?? [])
+      setProjects(prev => prev.map(p => {
+        if (p.id === toProjectId) return { ...p, cards: p.cards.filter(c => c.id !== cardId) }
+        if (p.id === fromProjectId) return { ...p, cards: [...p.cards, { ...moved, project_id: fromProjectId, sort_order: backOrder }] }
+        return p
+      }))
+      mutate(api.moveCard(cardId, fromProjectId), 'moveCard')
+    })
+
+    setProjects(prev => prev.map(p => {
+      if (p.id === fromProjectId) return { ...p, cards: p.cards.filter(c => c.id !== cardId) }
+      if (p.id === toProjectId) return { ...p, cards: [...p.cards, { ...card, project_id: toProjectId, sort_order }] }
+      return p
+    }))
+    mutate(api.moveCard(cardId, toProjectId), 'moveCard')
+  }
+
   const toggleCardComplete = (projectId, cardId) => {
     const project = projectsRef.current.find(p => p.id === projectId)
     const card = project?.cards.find(c => c.id === cardId)
@@ -451,7 +481,7 @@ export function useBoard() {
     projects, trashedProjects, tags, loading,
     addProject, updateProject, trashProject, restoreProject, deleteProject,
     addCard, addImageCard, updateCard, deleteCard, restoreCard, hardDeleteCard, toggleCardComplete,
-    reorderCards, reorderProjects,
+    reorderCards, moveCard, reorderProjects,
     setProjectStatus, setProjectTags, createTag, deleteTag,
     undo,
   }

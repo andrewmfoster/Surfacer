@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, FolderInput } from 'lucide-react'
+import { createPortal } from 'react-dom'
 import { useEditor, EditorContent, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
@@ -7,11 +8,17 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { useUploadsDir } from '../hooks/useUploadsDir'
+import ImageLightbox from './ImageLightbox'
 
-export default function Card({ card, onUpdate, onDelete, onToggleComplete }) {
+export default function Card({ card, onUpdate, onDelete, onToggleComplete, onMove, moveTargets }) {
   const uploadsDir = useUploadsDir()
   const [editing, setEditing] = useState(false)
   const [completing, setCompleting] = useState(false)
+  const [preview, setPreview] = useState(false)
+  const [moveOpen, setMoveOpen] = useState(false)
+  const [movePos, setMovePos] = useState({ top: 0, left: 0 })
+  const moveBtnRef = useRef()
+  const movePopoverRef = useRef()
   const cancelRef = useRef(false)
   const cardRef = useRef(null)
   // dirtyRef: user actually typed during this edit session. Without this, a board-changed
@@ -71,6 +78,29 @@ export default function Card({ card, onUpdate, onDelete, onToggleComplete }) {
     cardRef.current = node
   }, [setNodeRef])
 
+  useEffect(() => {
+    if (!moveOpen) return
+    const handler = (e) => {
+      if (
+        movePopoverRef.current && !movePopoverRef.current.contains(e.target) &&
+        moveBtnRef.current && !moveBtnRef.current.contains(e.target)
+      ) {
+        setMoveOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [moveOpen])
+
+  const handleMoveOpen = (e) => {
+    e.stopPropagation()
+    if (!moveOpen && moveBtnRef.current) {
+      const rect = moveBtnRef.current.getBoundingClientRect()
+      setMovePos({ top: rect.bottom + 6, left: rect.left })
+    }
+    setMoveOpen(o => !o)
+  }
+
   const handleMouseMove = useCallback((e) => {
     const el = cardRef.current
     if (!el || isDragging) return
@@ -124,6 +154,17 @@ export default function Card({ card, onUpdate, onDelete, onToggleComplete }) {
           title={card.completed ? 'Mark incomplete' : 'Mark complete'}
           aria-label={card.completed ? 'Mark incomplete' : 'Mark complete'}
         >✓</button>
+        {moveTargets?.length > 0 && (
+          <button
+            ref={moveBtnRef}
+            className="card-move"
+            onClick={handleMoveOpen}
+            onPointerDown={e => e.stopPropagation()}
+            tabIndex={-1}
+            title="Move to…"
+            aria-label="Move to another project"
+          ><FolderInput size={9} strokeWidth={1.8} /></button>
+        )}
         <button
           className="card-delete"
           onClick={e => { e.stopPropagation(); onDelete() }}
@@ -131,8 +172,24 @@ export default function Card({ card, onUpdate, onDelete, onToggleComplete }) {
           tabIndex={-1}
           title="Delete card"
           aria-label="Delete card"
-        ><Trash2 size={8} strokeWidth={1.8} /></button>
+        ><Trash2 size={9} strokeWidth={1.8} /></button>
       </div>
+
+      {moveOpen && createPortal(
+        <div ref={movePopoverRef} className="tag-popover" style={{ top: movePos.top, left: movePos.left }}>
+          <div className="tag-popover-list">
+            {moveTargets.map(t => (
+              <div key={t.id} className="tag-popover-row">
+                <button
+                  className="tag-popover-row-main move-popover-row"
+                  onClick={() => { onMove(t.id); setMoveOpen(false) }}
+                >{t.title}</button>
+              </div>
+            ))}
+          </div>
+        </div>,
+        document.body
+      )}
 
       {card.image && uploadsDir && (
         <img
@@ -141,6 +198,22 @@ export default function Card({ card, onUpdate, onDelete, onToggleComplete }) {
           alt=""
           draggable={false}
           onPointerDown={e => e.stopPropagation()}
+          onClick={e => {
+            e.stopPropagation()
+            const el = cardRef.current
+            if (el) {
+              el.style.setProperty('--shine-x', '50%')
+              el.style.setProperty('--shine-y', '0%')
+            }
+            setPreview(true)
+          }}
+        />
+      )}
+
+      {preview && card.image && uploadsDir && (
+        <ImageLightbox
+          src={convertFileSrc(`${uploadsDir}/${card.image}`)}
+          onClose={() => setPreview(false)}
         />
       )}
 

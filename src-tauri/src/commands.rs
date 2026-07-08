@@ -392,6 +392,53 @@ pub fn reorder_cards(
 }
 
 #[tauri::command]
+pub fn move_card(
+    app: AppHandle,
+    state: State<'_, DbState>,
+    id: String,
+    project_id: String,
+) -> Result<(), String> {
+    if id.is_empty() || id.len() > ID_MAX {
+        return Err("invalid id".into());
+    }
+    if project_id.is_empty() || project_id.len() > ID_MAX {
+        return Err("invalid project_id".into());
+    }
+    let conn = state.0.lock().map_err(|e| e.to_string())?;
+    // Reject a move into a missing/trashed project up front with a clear message
+    // rather than letting the FK constraint surface a generic DB error.
+    if !conn
+        .prepare("SELECT 1 FROM projects WHERE id = ?1 AND trashed = 0")
+        .map_err(|e| e.to_string())?
+        .exists(params![project_id])
+        .map_err(|e| e.to_string())?
+    {
+        return Err("unknown project id".into());
+    }
+    // Append to the end of the destination column.
+    let sort_order: i64 = conn
+        .query_row(
+            "SELECT COALESCE(MAX(sort_order), -1) + 1 FROM cards WHERE project_id = ?1 AND deleted = 0",
+            params![project_id],
+            |row| row.get(0),
+        )
+        .map_err(|e| e.to_string())?;
+    // 0 rows changed = id doesn't exist; bail so a stale/forged id can't silently no-op.
+    if conn
+        .execute(
+            "UPDATE cards SET project_id = ?1, sort_order = ?2 WHERE id = ?3",
+            params![project_id, sort_order, id],
+        )
+        .map_err(|e| e.to_string())?
+        == 0
+    {
+        return Err("unknown card id".into());
+    }
+    notify_board_changed(&app);
+    Ok(())
+}
+
+#[tauri::command]
 pub fn trash_project(app: AppHandle, state: State<'_, DbState>, id: String) -> Result<(), String> {
     if id.is_empty() || id.len() > ID_MAX {
         return Err("invalid id".into());

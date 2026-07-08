@@ -477,6 +477,7 @@ pub fn run() {
             commands::restore_card,
             commands::delete_card,
             commands::reorder_cards,
+            commands::move_card,
             commands::list_tags,
             commands::create_tag,
             commands::delete_tag,

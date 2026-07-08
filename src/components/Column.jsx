@@ -234,11 +234,13 @@ export default function Column({
   restoreCard,
   hardDeleteCard,
   reorderCards,
+  moveCard,
   toggleCardComplete,
   setProjectStatus,
   setProjectTags,
   createTag,
   deleteTag,
+  allProjects,
 }) {
   const [newText, setNewText] = useState('')
   const [adding, setAdding] = useState(false)
@@ -248,6 +250,7 @@ export default function Column({
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { delay: 250, tolerance: 5 } }))
 
+  const moveTargets = (allProjects ?? []).filter(p => p.id !== project.id).map(p => ({ id: p.id, title: p.title }))
   const activeCards = project.cards.filter(c => !c.completed && !c.deleted)
   const completedCards = project.cards.filter(c => c.completed && !c.deleted)
   const deletedCards = project.cards.filter(c => c.deleted)
@@ -266,19 +269,18 @@ export default function Column({
     const rect = el.getBoundingClientRect()
     const dx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2)
     const dy = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2)
-    const base = CSS.Transform.toString(transform) || ''
-    el.style.transition = 'box-shadow 0.12s'
-    el.style.transform = [base, `perspective(1400px) rotateY(${dx * 2.5}deg) rotateX(${-dy * 1.5}deg) translateY(-2px)`].filter(Boolean).join(' ')
+    el.style.setProperty('--tilt-ry', `${dx * 2.5}deg`)
+    el.style.setProperty('--tilt-rx', `${-dy * 1.5}deg`)
     el.style.setProperty('--shine-x', `${((dx + 1) / 2) * 100}%`)
     el.style.setProperty('--shine-y', `${((dy + 1) / 2) * 100}%`)
-  }, [isDragging, transform])
+  }, [isDragging])
 
   const handleMouseLeave = useCallback(() => {
     const el = colRef.current
     if (!el || isDragging) return
-    el.style.transition = 'transform 0.45s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s'
-    el.style.transform = CSS.Transform.toString(transform) || ''
-  }, [isDragging, transform])
+    el.style.setProperty('--tilt-ry', '0deg')
+    el.style.setProperty('--tilt-rx', '0deg')
+  }, [isDragging])
 
   const handleFileDragOver = useCallback((e) => {
     if ([...e.dataTransfer.types].includes('Files')) {
@@ -419,6 +421,8 @@ export default function Column({
                 onUpdate={text => updateCard(project.id, card.id, text)}
                 onDelete={() => deleteCard(project.id, card.id)}
                 onToggleComplete={() => toggleCardComplete(project.id, card.id)}
+                moveTargets={moveTargets}
+                onMove={pid => moveCard(project.id, card.id, pid)}
               />
             ))}
           </SortableContext>
@@ -442,6 +446,8 @@ export default function Column({
                     onUpdate={text => updateCard(project.id, card.id, text)}
                     onDelete={() => deleteCard(project.id, card.id)}
                     onToggleComplete={() => toggleCardComplete(project.id, card.id)}
+                    moveTargets={moveTargets}
+                    onMove={pid => moveCard(project.id, card.id, pid)}
                   />
                 ))}
               </div>

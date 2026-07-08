@@ -351,13 +351,17 @@ body:has(.app) {
   backdrop-filter: blur(20px) saturate(120%);
   -webkit-backdrop-filter: blur(20px) saturate(120%);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
-  transition: border-color 0.2s, box-shadow 0.3s;
+  transition: border-color 0.2s, box-shadow 0.3s, transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
   cursor: grab;
 }
 
 .column:hover {
   border-color: var(--border-mid);
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  /* hover-gated so a missed mouseleave (e.g. lightbox covering the board)
+     can never strand a tilt — no hover, no transform */
+  transform: perspective(1400px) rotateY(var(--tilt-ry, 0deg)) rotateX(var(--tilt-rx, 0deg)) translateY(-2px);
+  transition: border-color 0.2s, box-shadow 0.12s, transform 0.05s linear;
 }
 
 .column::after {
@@ -541,7 +545,7 @@ body:has(.app) {
   border-radius: 7px;
   padding: 7px 26px 7px 8px;
   position: relative;
-  min-height: 46px;
+  min-height: 58px;
   flex-shrink: 0;
   transition: background 0.12s, border-color 0.12s, transform 0.2s;
 }
@@ -579,7 +583,8 @@ body:has(.app) {
 
 .card-actions {
   position: absolute;
-  top: 5px;
+  top: 50%;
+  transform: translateY(-50%);
   right: 5px;
   display: flex;
   flex-direction: column;
@@ -634,7 +639,7 @@ body:has(.app) {
   margin-bottom: 8px;
   max-height: 260px;
   object-fit: cover;
-  pointer-events: none;
+  cursor: zoom-in;
 }
 
 .card--has-image.card--completed .card-image {
@@ -771,6 +776,28 @@ body:has(.app) {
   border-color: rgba(220,60,60,0.6);
   background: rgba(220,60,60,0.12);
   color: var(--red);
+}
+
+.card-move {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  color: var(--dimmed);
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.card-move:hover {
+  border-color: rgba(74,130,216,0.6);
+  background: rgba(74,130,216,0.12);
+  color: #4a82d8;
 }
 
 .card--completed {
@@ -1097,6 +1124,14 @@ body:has(.app) {
 
 .tag-popover-row-main:hover { background: rgba(255, 255, 255, 0.07); }
 .tag-popover-row--on .tag-popover-row-main { background: rgba(255, 255, 255, 0.05); }
+
+.move-popover-row {
+  color: var(--muted);
+  font-size: 12px;
+  transition: color 0.1s, background 0.1s;
+}
+
+.move-popover-row:hover { color: var(--text); }
 
 .tag-row-check {
   margin-left: auto;
@@ -1513,6 +1548,28 @@ body:has(.app) {
 
 .modal-backdrop--expanded {
   padding: 0;
+}
+
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  left: 0;
+  z-index: 30000;
+  background: rgba(5, 8, 18, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.lightbox-img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), 0 1px 0 rgba(255, 255, 255, 0.10) inset;
 }
 
 .modal {

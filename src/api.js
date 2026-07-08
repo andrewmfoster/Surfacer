@@ -59,6 +59,7 @@ export const api = {
   saveCard:         (card)                => invoke('save_card', { card: toCardInput(card) }),
   deleteCard:       (id)                  => invoke('delete_card', { id }),
   reorderCards:     (ids)                 => invoke('reorder_cards', { ids }),
+  moveCard:         (id, projectId)       => invoke('move_card', { id, projectId }),
   completeCard:     (id, completed)       => invoke('complete_card', { id, completed: !!completed }),
   softDeleteCard:   (id)                  => invoke('trash_card', { id }),
   restoreCard:      (id)                  => invoke('restore_card', { id }),
