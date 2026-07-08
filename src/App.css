@@ -399,6 +399,12 @@ body:has(.app) {
   cursor: default;
 }
 
+/* The board clips titles to one line (fixed column width); the compact focus
+   card is too narrow for that — wrap instead. */
+.focus-stage .col-title {
+  white-space: normal;
+}
+
 /* ── Column ────────────────────────────────────────────── */
 
 .column {
@@ -668,13 +674,20 @@ body:has(.app) {
 
 .card-actions {
   position: absolute;
-  /* top-aligned, not centered — a predictable spot regardless of card height */
-  top: 7px;
-  right: 5px;
+  /* horizontal row pinned top-right — a vertical stack outgrows short cards,
+     a 15px row fits every card height. Backdrop keeps it legible where the
+     row overlaps a long first line on hover. */
+  top: 4px;
+  right: 4px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
+  padding: 3px 4px;
+  border-radius: 12px;
+  background: rgba(8, 11, 22, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   opacity: 0;
   transition: opacity 0.1s;
 }
