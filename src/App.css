@@ -393,7 +393,7 @@ body:has(.app) {
 
 .focus-stage .column {
   width: 100%;
-  /* 384 + stage padding = the 420px frame set_focus_frame animates to;
+  /* 300 + stage padding = the 336px frame set_focus_frame animates to;
      the cap only matters if the user manually widens while focused */
   max-width: 544px;
   cursor: default;
@@ -668,8 +668,8 @@ body:has(.app) {
 
 .card-actions {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  /* top-aligned, not centered — a predictable spot regardless of card height */
+  top: 7px;
   right: 5px;
   display: flex;
   flex-direction: column;

@@ -106,7 +106,7 @@ export default function App() {
       requestAnimationFrame(() => {
         const col = focusStageRef.current?.querySelector('.column')
         const content = (col?.scrollHeight ?? 480) + 38 + 30 // + bar + stage padding
-        api.setFocusFrame(420, Math.min(Math.max(content, 320), 860), true)
+        api.setFocusFrame(336, Math.min(Math.max(content, 320), 860), true)
       })
     } else if (!focusedProject && wasFocusedRef.current) {
       wasFocusedRef.current = false
