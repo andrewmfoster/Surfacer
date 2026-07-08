@@ -29,6 +29,12 @@ AUDIT-PASS5.md
 # Internal dev notes / hard-won gotchas — working memory, not public
 DEV-NOTES.md
 
+# Personal cloud-sync / mobile plan — not a public feature
+SYNC-MOBILE-PLAN.md
+
+# Internal planning doc (widget → focus-mode pivot) — not public
+WIDGET_PLAN.md
+
 # Claude Code local session artifacts (workflow scripts, settings.local.json)
 .claude/
 

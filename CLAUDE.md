@@ -10,6 +10,19 @@ Design language — status colors, drag behaviors, the screenshot overlay, and t
 - **No HTTP loopback.** Communication is Tauri IPC only — no network listener bound anywhere.
 - **Coarse events, not per-entity.** A mutation calls `app.emit("board-changed", ())`; the renderer uses `listen('board-changed', ...)` from `@tauri-apps/api/event` and refetches the whole board. Simpler than per-entity events, and on in-process IPC the refetch cost is nil.
 - **DB path.** `~/Library/Application Support/com.surfacer.app/surfacer.db` (Tauri derives the dir from the bundle identifier). WAL mode; schema init + integrity check happen on open — see `db.rs`.
+- **External processes touch the SQLite file directly.** The `/surfacer` skill reads it, and `/wrap` (inbox checkoff) + `/obsidian-glean` (journal → cards) WRITE it via the `sqlite3` CLI. This is allowed: the IPC-only lock forbids a *network surface*, not an external process opening the DB file. Such writes use `PRAGMA busy_timeout` and INSERT/scoped-UPDATE only; they do NOT fire `board-changed`, so a running app shows the change only after reload. `/obsidian-glean` writes to the auto-created `Journal Intake` project.
+
+## Gotchas
+
+- **Hover effects must be CSS-gated, not event-driven.** The column tilt/shine is driven by
+  CSS vars set on mousemove, but the *transform itself* lives under `.column:hover` — never
+  apply it as an inline style from JS. An overlay (lightbox, modal) swallows the pointer, the
+  element never gets its `mouseleave`, and an inline transform strands frozen on screen.
+  `:hover` is recomputed by hit-testing, so it can't strand. (Learned 2026-07-07: three fix
+  attempts before this.)
+- **Vite HMR keeps stale inline styles.** Code swapped by HMR doesn't clean styles the old
+  code wrote onto DOM nodes. When verifying a fix to a style *mechanism*, Cmd+R the webview
+  first — otherwise the old symptom persists and the fix looks broken.
 
 ## Running
 
