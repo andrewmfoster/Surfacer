@@ -405,6 +405,13 @@ body:has(.app) {
   white-space: normal;
 }
 
+/* Board thumbnails crop-to-fill (uniform look at fixed column width); in a
+   resizable focus card that reads as zooming. Fit the whole screenshot and
+   stop growing once fully visible, centered both ways. */
+.focus-stage .card-image {
+  object-fit: contain;
+}
+
 /* ── Column ────────────────────────────────────────────── */
 
 .column {
@@ -674,20 +681,14 @@ body:has(.app) {
 
 .card-actions {
   position: absolute;
-  /* horizontal row pinned top-right — a vertical stack outgrows short cards,
-     a 15px row fits every card height. Backdrop keeps it legible where the
-     row overlaps a long first line on hover. */
+  /* top-aligned, not centered — a predictable spot regardless of card height.
+     13px buttons keep the 3-stack (43px) well inside the 58px card minimum. */
   top: 4px;
-  right: 4px;
+  right: 5px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 3px 4px;
-  border-radius: 12px;
-  background: rgba(8, 11, 22, 0.72);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  gap: 2px;
   opacity: 0;
   transition: opacity 0.1s;
 }
@@ -695,8 +696,8 @@ body:has(.app) {
 .card:hover .card-actions { opacity: 1; }
 
 .card-check {
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   border: 1.5px solid rgba(255,255,255,0.2);
   background: transparent;
@@ -855,8 +856,8 @@ body:has(.app) {
 }
 
 .card-delete {
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   border: 1.5px solid rgba(255,255,255,0.15);
   background: transparent;
@@ -877,8 +878,8 @@ body:has(.app) {
 }
 
 .card-move {
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   border: 1.5px solid rgba(255,255,255,0.15);
   background: transparent;
@@ -1681,6 +1682,15 @@ body:has(.app) {
   align-items: center;
   justify-content: center;
   padding: 24px;
+}
+
+/* In the project modal the close button sits in a positioned header wrapper;
+   here it's a bare flex child and would float beside the centered image —
+   pin it to the popup's top-right corner. */
+.lightbox-backdrop .modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
 }
 
 .lightbox-img {
