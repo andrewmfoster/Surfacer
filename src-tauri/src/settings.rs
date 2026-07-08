@@ -262,12 +262,20 @@ pub async fn pick_screenshots_dir(
     write_screenshot_dir(&app, &path_str)?;
 
     // Redirect macOS's screenshot save sink to the chosen folder so new
-    // screenshots land where we're watching. Mirrors the JS port's
-    // `defaults write com.apple.screencapture location`. We don't restart
-    // SystemUIServer — the next screenshot picks up the new value.
-    let _ = std::process::Command::new("defaults")
-        .args(["write", "com.apple.screencapture", "location", &path_str])
-        .status();
+    // screenshots land where we're watching. Bounces the location-caching
+    // daemons too — a bare `defaults write` leaves them saving to the old
+    // folder (the 2026-07-07 vanishing-screenshots bug).
+    crate::screenshot::redirect_capture_sink(&path_str);
+
+    // If macOS won't let us read the picked dir (e.g. ~/Desktop without
+    // permission), warn immediately. The watcher restart below also surfaces
+    // this, but only when the overlay toggle is on — with it off, a bad pick
+    // used to break silently.
+    if let Err(e) = std::fs::read_dir(&path_str) {
+        if e.kind() == std::io::ErrorKind::PermissionDenied {
+            crate::screenshot::prompt_eperm_redirect(&app);
+        }
+    }
 
     // Restart the watcher so it targets the new dir. If overlay is off,
     // stop is a no-op and start early-returns since no watcher will exist

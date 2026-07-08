@@ -160,7 +160,7 @@ fn seed_known(dir: &Path) -> HashSet<PathBuf> {
 // The callback fires on the user's response; "Change Location" runs the
 // redirect and starts the watcher on the owned dir, which is readable, so it
 // won't re-prompt.
-fn prompt_eperm_redirect(app: &AppHandle) {
+pub(crate) fn prompt_eperm_redirect(app: &AppHandle) {
     let owned_dir = match app.path().app_data_dir() {
         Ok(d) => d.join("Screenshots"),
         Err(e) => {
@@ -192,6 +192,21 @@ fn prompt_eperm_redirect(app: &AppHandle) {
         });
 }
 
+// Point macOS's screencapture sink at `dir_str` and bounce the daemons that
+// cache the location. `defaults write` alone is NOT enough: SystemUIServer /
+// screencaptureui keep the old value in memory and screenshots keep landing in
+// the previous folder — where nothing is watching (observed 2026-07-07: pref
+// read back the new dir while captures still hit the old one). killall is safe;
+// both daemons respawn on demand. Cost is a brief menu-bar flicker.
+pub(crate) fn redirect_capture_sink(dir_str: &str) {
+    let _ = std::process::Command::new("defaults")
+        .args(["write", "com.apple.screencapture", "location", dir_str])
+        .status();
+    for daemon in ["SystemUIServer", "screencaptureui"] {
+        let _ = std::process::Command::new("killall").arg(daemon).status();
+    }
+}
+
 // Create a Surfacer-owned screenshots folder, point macOS's screencapture sink
 // at it, persist it as the custom dir, and start watching. Same steps as
 // settings::pick_screenshots_dir, just sourced from the EPERM prompt instead of
@@ -202,9 +217,7 @@ fn redirect_to_owned_dir(app: &AppHandle, dir: &Path) {
         return;
     }
     let dir_str = dir.to_string_lossy().to_string();
-    let _ = std::process::Command::new("defaults")
-        .args(["write", "com.apple.screencapture", "location", &dir_str])
-        .status();
+    redirect_capture_sink(&dir_str);
     if let Err(e) = settings::write_screenshot_dir(app, &dir_str) {
         eprintln!("[screenshot] failed to persist screenshot dir: {e}");
     }
