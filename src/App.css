@@ -14,6 +14,10 @@
   --muted: rgba(255, 255, 255, 0.48);
   --dimmed: rgba(255, 255, 255, 0.22);
   --red: #f87171;
+  /* Focus-mode accent. Fixed cyan, deliberately NOT the per-project
+     --col-accent: red-accented projects made the focus pill hover read as a
+     second delete button. */
+  --cyan: #4cc8dc;
   --col-w: 272px;
   --gap: 10px;
   --sidebar-w: 210px;
@@ -344,25 +348,14 @@ body:has(.app) {
 .focus-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  /* exit button rides right; the column's own title carries the context */
+  justify-content: flex-end;
   flex-shrink: 0;
   height: 38px;
   /* clear the macOS traffic-light buttons top-left */
   padding: 0 12px 0 78px;
   background: linear-gradient(to bottom, #0d1025 0%, transparent 100%);
   z-index: 10000;
-}
-
-.focus-bar-title {
-  font-family: var(--font-ui);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  pointer-events: none;
 }
 
 .focus-exit-btn {
@@ -397,7 +390,8 @@ body:has(.app) {
 
 .focus-stage .column {
   width: 100%;
-  max-width: 680px;
+  /* 544 + stage padding = the 580px frame set_focus_frame animates to */
+  max-width: 544px;
   cursor: default;
 }
 
@@ -551,9 +545,9 @@ body:has(.app) {
 }
 
 .col-focus-pill:hover {
-  color: var(--col-accent);
-  background: color-mix(in srgb, var(--col-accent) 12%, transparent);
-  border-color: color-mix(in srgb, var(--col-accent) 25%, transparent);
+  color: var(--cyan);
+  background: color-mix(in srgb, var(--cyan) 12%, transparent);
+  border-color: color-mix(in srgb, var(--cyan) 25%, transparent);
   transform: scale(1.1);
 }
 
@@ -1579,9 +1573,9 @@ body:has(.app) {
 }
 
 .bulletin-card-focus:hover {
-  color: var(--col-accent);
-  background: color-mix(in srgb, var(--col-accent) 12%, transparent);
-  border-color: color-mix(in srgb, var(--col-accent) 25%, transparent);
+  color: var(--cyan);
+  background: color-mix(in srgb, var(--cyan) 12%, transparent);
+  border-color: color-mix(in srgb, var(--cyan) 25%, transparent);
   transform: scale(1.1);
 }
 

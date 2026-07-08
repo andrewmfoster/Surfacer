@@ -333,6 +333,72 @@ fn quit_app(app: AppHandle) {
     app.exit(0);
 }
 
+// Focus mode: animate the main window between its normal frame and a compact
+// single-project frame. NSWindow's setFrame:display:animate: gives the native
+// smooth resize — Tauri's set_size is instantaneous. The pre-focus size is
+// remembered (single main window → a static, not managed state) so exiting
+// restores exactly what the user had; a relaunch that starts focused falls
+// back to the tauri.conf.json default on exit. Min-size is dropped while
+// focused — the compact frame sits below the config minimums (520x600), which
+// would clamp the shrink.
+static FOCUS_PREV_SIZE: Mutex<Option<(f64, f64)>> = Mutex::new(None);
+
+#[tauri::command]
+fn set_focus_frame(
+    app: AppHandle,
+    window: tauri::Window,
+    width: f64,
+    height: f64,
+    focus: bool,
+) -> Result<(), String> {
+    commands::require_main_window(&window)?;
+    let main = app
+        .get_webview_window("main")
+        .ok_or_else(|| "no main window".to_string())?;
+
+    let (w, h) = if focus {
+        let scale = main.scale_factor().map_err(|e| e.to_string())?;
+        let current = main
+            .outer_size()
+            .map_err(|e| e.to_string())?
+            .to_logical::<f64>(scale);
+        *FOCUS_PREV_SIZE.lock().unwrap() = Some((current.width, current.height));
+        let _ = main.set_min_size(Some(tauri::LogicalSize::new(360.0, 280.0)));
+        (width, height)
+    } else {
+        // Restore the config minimums (main window in tauri.conf.json).
+        let _ = main.set_min_size(Some(tauri::LogicalSize::new(520.0, 600.0)));
+        FOCUS_PREV_SIZE
+            .lock()
+            .unwrap()
+            .take()
+            .unwrap_or((1440.0, 900.0))
+    };
+
+    // Sync commands run on the main thread, but route through
+    // run_on_main_thread anyway — AppKit traps NSWindow ops off it (see
+    // close_tray above).
+    let win = main.clone();
+    main.run_on_main_thread(move || {
+        let Ok(ns) = win.ns_window() else { return };
+        let ns = ns as *mut objc2::runtime::AnyObject;
+        unsafe {
+            let frame: objc2_foundation::NSRect = objc2::msg_send![&*ns, frame];
+            // NSWindow's origin is bottom-left; shift y so the top edge (and
+            // the traffic lights under the cursor) stays put.
+            let target = objc2_foundation::NSRect::new(
+                objc2_foundation::NSPoint::new(
+                    frame.origin.x,
+                    frame.origin.y + frame.size.height - h,
+                ),
+                objc2_foundation::NSSize::new(w, h),
+            );
+            let _: () = objc2::msg_send![&*ns, setFrame: target, display: true, animate: true];
+        }
+    })
+    .map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 // Hard-delete cards soft-deleted longer than the user's autoPurgeDays window.
 // Runs once at startup then every 24h. Reads the setting fresh each sweep, so a
@@ -461,6 +527,7 @@ pub fn run() {
             open_project_in_main,
             close_tray,
             quit_app,
+            set_focus_frame,
             commands::get_uploads_dir,
             commands::get_board,
             commands::get_trash,

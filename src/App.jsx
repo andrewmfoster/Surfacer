@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Trash2, ScrollText, LayoutGrid, Settings, X } from 'lucide-react'
 import { listen } from '@tauri-apps/api/event'
+import { api } from './api'
 import { useBoard } from './hooks/useBoard'
 import Board from './components/Board'
 import TrashView from './components/TrashView'
@@ -93,6 +94,26 @@ export default function App() {
     if (focusedProjectId && !board.loading && !focusedProject) setFocusPersisted(null)
   }, [focusedProjectId, board.loading, focusedProject])
 
+  // Animate the window to a compact frame fitted to the focused column's
+  // content; exit restores the pre-focus size (the Rust side remembers it).
+  const focusStageRef = useRef(null)
+  const wasFocusedRef = useRef(false)
+  useEffect(() => {
+    if (focusedProject && !wasFocusedRef.current) {
+      wasFocusedRef.current = true
+      // Let the focus layout paint once so the column's real height is
+      // measurable before sizing the window to it.
+      requestAnimationFrame(() => {
+        const col = focusStageRef.current?.querySelector('.column')
+        const content = (col?.scrollHeight ?? 480) + 38 + 30 // + bar + stage padding
+        api.setFocusFrame(580, Math.min(Math.max(content, 320), 860), true)
+      })
+    } else if (!focusedProject && wasFocusedRef.current) {
+      wasFocusedRef.current = false
+      api.setFocusFrame(0, 0, false)
+    }
+  }, [focusedProject])
+
   // Esc exits focus — but never while a modal/lightbox or inline editor holds it.
   useEffect(() => {
     if (!focusedProject) return
@@ -139,7 +160,6 @@ export default function App() {
       {focusedProject ? (
         <>
           <div className="focus-bar" data-tauri-drag-region>
-            <span className="focus-bar-title">{focusedProject.title}</span>
             <button
               className="focus-exit-btn"
               onClick={() => setFocusPersisted(null)}
@@ -150,7 +170,7 @@ export default function App() {
               Exit focus
             </button>
           </div>
-          <div className="focus-stage">
+          <div className="focus-stage" ref={focusStageRef}>
             <Column {...board} project={focusedProject} allProjects={board.projects} inFocus />
           </div>
         </>

@@ -24,6 +24,10 @@ tauri-plugin-dialog = "2"
 tauri-plugin-autostart = "2"
 tauri-plugin-single-instance = "2"
 tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2.1" }
+# Focus-mode animated resize: raw msg_send to NSWindow setFrame:display:animate:.
+# Both crates are already in the tree via tauri-nspanel — no new compile weight.
+objc2 = "0.6"
+objc2-foundation = "0.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rusqlite = { version = "0.40.0", features = ["bundled"] }
