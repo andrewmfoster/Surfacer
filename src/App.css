@@ -343,6 +343,9 @@ body:has(.app) {
 
 .app--focus {
   flex-direction: column;
+  /* the board's 520px floor would clip the compact frame — in focus mode the
+     content must follow the window all the way down */
+  min-width: 0;
 }
 
 .focus-bar {
@@ -390,7 +393,8 @@ body:has(.app) {
 
 .focus-stage .column {
   width: 100%;
-  /* 544 + stage padding = the 580px frame set_focus_frame animates to */
+  /* 384 + stage padding = the 420px frame set_focus_frame animates to;
+     the cap only matters if the user manually widens while focused */
   max-width: 544px;
   cursor: default;
 }

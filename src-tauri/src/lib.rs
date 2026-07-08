@@ -363,7 +363,7 @@ fn set_focus_frame(
             .map_err(|e| e.to_string())?
             .to_logical::<f64>(scale);
         *FOCUS_PREV_SIZE.lock().unwrap() = Some((current.width, current.height));
-        let _ = main.set_min_size(Some(tauri::LogicalSize::new(360.0, 280.0)));
+        let _ = main.set_min_size(Some(tauri::LogicalSize::new(300.0, 280.0)));
         (width, height)
     } else {
         // Restore the config minimums (main window in tauri.conf.json).
