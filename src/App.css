@@ -643,7 +643,8 @@ body:has(.app) {
   border-radius: 7px;
   padding: 7px 26px 7px 8px;
   position: relative;
-  min-height: 58px;
+  /* tall enough for the 16px action-button stack (top 4 + 3x16 + 2x2 gaps) */
+  min-height: 68px;
   flex-shrink: 0;
   transition: background 0.12s, border-color 0.12s, transform 0.2s;
 }
@@ -682,7 +683,8 @@ body:has(.app) {
 .card-actions {
   position: absolute;
   /* top-aligned, not centered — a predictable spot regardless of card height.
-     13px buttons keep the 3-stack (43px) well inside the 58px card minimum. */
+     16px buttons for legibility; the 3-stack (56px) needs the 68px card
+     minimum below. */
   top: 4px;
   right: 5px;
   display: flex;
@@ -696,8 +698,8 @@ body:has(.app) {
 .card:hover .card-actions { opacity: 1; }
 
 .card-check {
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 1.5px solid rgba(255,255,255,0.2);
   background: transparent;
@@ -705,7 +707,7 @@ body:has(.app) {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 8px;
+  font-size: 9px;
   line-height: 1;
   padding: 0;
   color: transparent;
@@ -856,8 +858,8 @@ body:has(.app) {
 }
 
 .card-delete {
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 1.5px solid rgba(255,255,255,0.15);
   background: transparent;
@@ -878,8 +880,8 @@ body:has(.app) {
 }
 
 .card-move {
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 1.5px solid rgba(255,255,255,0.15);
   background: transparent;

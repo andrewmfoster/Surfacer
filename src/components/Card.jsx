@@ -163,7 +163,7 @@ export default function Card({ card, onUpdate, onDelete, onToggleComplete, onMov
             tabIndex={-1}
             title="Move to…"
             aria-label="Move to another project"
-          ><FolderInput size={9} strokeWidth={1.8} /></button>
+          ><FolderInput size={10} strokeWidth={1.8} /></button>
         )}
         <button
           className="card-delete"
@@ -172,7 +172,7 @@ export default function Card({ card, onUpdate, onDelete, onToggleComplete, onMov
           tabIndex={-1}
           title="Delete card"
           aria-label="Delete card"
-        ><Trash2 size={9} strokeWidth={1.8} /></button>
+        ><Trash2 size={10} strokeWidth={1.8} /></button>
       </div>
 
       {moveOpen && createPortal(
