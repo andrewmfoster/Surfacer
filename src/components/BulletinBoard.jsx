@@ -4,10 +4,10 @@ import { tagColor } from './Column'
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, rectSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Focus } from 'lucide-react'
 import { STATUS_COLORS, STATUS_LABELS } from '../status'
 
-function BulletinCard({ project, onOpen, onTrash }) {
+function BulletinCard({ project, onOpen, onTrash, onFocus }) {
   const cardRef = useRef(null)
   const status = project.status ?? 'active'
 
@@ -58,6 +58,16 @@ function BulletinCard({ project, onOpen, onTrash }) {
     >
       <div className="bulletin-card-actions">
         <button
+          className="bulletin-card-focus"
+          onClick={e => { e.stopPropagation(); onFocus(project.id) }}
+          onPointerDown={e => e.stopPropagation()}
+          tabIndex={-1}
+          title="Focus this project"
+          aria-label="Focus this project"
+        >
+          <Focus size={10} strokeWidth={2} />
+        </button>
+        <button
           className="bulletin-card-delete"
           onClick={e => { e.stopPropagation(); onTrash(project.id) }}
           onPointerDown={e => e.stopPropagation()}
@@ -89,7 +99,7 @@ function BulletinCard({ project, onOpen, onTrash }) {
   )
 }
 
-export default function BulletinBoard({ projects, onOpen, onTrash, onReorder, reorderDisabled }) {
+export default function BulletinBoard({ projects, onOpen, onTrash, onFocus, onReorder, reorderDisabled }) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
   const handleDragEnd = ({ active, over }) => {
@@ -120,7 +130,7 @@ export default function BulletinBoard({ projects, onOpen, onTrash, onReorder, re
                   exit={{ opacity: 0, scale: 0.94, transition: { duration: 0.18 } }}
                   transition={{ type: 'spring', stiffness: 280, damping: 28, delay: i * 0.05 }}
                 >
-                  <BulletinCard project={p} onOpen={onOpen} onTrash={onTrash} />
+                  <BulletinCard project={p} onOpen={onOpen} onTrash={onTrash} onFocus={onFocus} />
                 </motion.div>
               ))}
             </AnimatePresence>

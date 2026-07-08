@@ -335,6 +335,72 @@ body:has(.app) {
 .board::-webkit-scrollbar-track { background: transparent; }
 .board::-webkit-scrollbar-thumb { background: var(--dimmed); border-radius: 2px; }
 
+/* ── Focus mode ─────────────────────────────────────────── */
+
+.app--focus {
+  flex-direction: column;
+}
+
+.focus-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 38px;
+  /* clear the macOS traffic-light buttons top-left */
+  padding: 0 12px 0 78px;
+  background: linear-gradient(to bottom, #0d1025 0%, transparent 100%);
+  z-index: 10000;
+}
+
+.focus-bar-title {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.focus-exit-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-mid);
+  border-radius: 20px;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-family: var(--font-ui);
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.focus-exit-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.focus-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 18px 18px;
+}
+
+.focus-stage .column {
+  width: 100%;
+  max-width: 680px;
+  cursor: default;
+}
+
 /* ── Column ────────────────────────────────────────────── */
 
 .column {
@@ -467,6 +533,27 @@ body:has(.app) {
   color: var(--red);
   background: rgba(248, 113, 113, 0.12);
   border-color: rgba(248, 113, 113, 0.25);
+  transform: scale(1.1);
+}
+
+.col-focus-pill {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border);
+  color: var(--dimmed);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.col-focus-pill:hover {
+  color: var(--col-accent);
+  background: color-mix(in srgb, var(--col-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--col-accent) 25%, transparent);
   transform: scale(1.1);
 }
 
@@ -1474,6 +1561,27 @@ body:has(.app) {
   color: var(--red);
   background: rgba(248, 113, 113, 0.12);
   border-color: rgba(248, 113, 113, 0.25);
+  transform: scale(1.1);
+}
+
+.bulletin-card-focus {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border);
+  color: var(--dimmed);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.bulletin-card-focus:hover {
+  color: var(--col-accent);
+  background: color-mix(in srgb, var(--col-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--col-accent) 25%, transparent);
   transform: scale(1.1);
 }
 

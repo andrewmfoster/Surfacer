@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Trash2, ScrollText, LayoutGrid, Settings } from 'lucide-react'
+import { Trash2, ScrollText, LayoutGrid, Settings, X } from 'lucide-react'
 import { listen } from '@tauri-apps/api/event'
 import { useBoard } from './hooks/useBoard'
 import Board from './components/Board'
@@ -9,7 +9,7 @@ import ProjectModal from './components/ProjectModal'
 import SettingsModal from './components/SettingsModal'
 import WelcomeCard from './components/WelcomeCard'
 import MeshGradient from './components/MeshGradient'
-import { tagColor } from './components/Column'
+import Column, { tagColor } from './components/Column'
 import { STATUS_COLORS, STATUS_LABELS } from './status'
 import './App.css'
 
@@ -28,6 +28,15 @@ export default function App() {
   }
   const [openProjectId, setOpenProjectId] = useState(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
+
+  const [focusedProjectId, setFocusedProjectId] = useState(
+    () => localStorage.getItem('surfacer-focus-project') || null
+  )
+  const setFocusPersisted = (id) => {
+    if (id) localStorage.setItem('surfacer-focus-project', id)
+    else localStorage.removeItem('surfacer-focus-project')
+    setFocusedProjectId(id || null)
+  }
 
   const [welcomeDismissed, setWelcomeDismissed] = useState(
     () => localStorage.getItem('surfacer:welcome-dismissed') === '1'
@@ -75,6 +84,29 @@ export default function App() {
     return () => document.removeEventListener('keydown', handler)
   }, [])
 
+  const focusedProject = focusedProjectId
+    ? board.projects.find(p => p.id === focusedProjectId)
+    : null
+
+  // Auto-exit focus if the project disappears (trashed / deleted elsewhere).
+  useEffect(() => {
+    if (focusedProjectId && !board.loading && !focusedProject) setFocusPersisted(null)
+  }, [focusedProjectId, board.loading, focusedProject])
+
+  // Esc exits focus — but never while a modal/lightbox or inline editor holds it.
+  useEffect(() => {
+    if (!focusedProject) return
+    const handler = (e) => {
+      if (e.key !== 'Escape' || openProjectId || settingsOpen) return
+      const active = document.activeElement
+      if (active?.closest?.('[contenteditable="true"]')) return
+      if (['INPUT', 'TEXTAREA'].includes(active?.tagName)) return
+      setFocusPersisted(null)
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [focusedProject, openProjectId, settingsOpen])
+
   const toggleStatus = (status) => {
     setActiveStatuses(prev => {
       const next = new Set(prev)
@@ -103,7 +135,27 @@ export default function App() {
   return (
     <>
     <MeshGradient />
-    <div className="app">
+    <div className={`app${focusedProject ? ' app--focus' : ''}`}>
+      {focusedProject ? (
+        <>
+          <div className="focus-bar" data-tauri-drag-region>
+            <span className="focus-bar-title">{focusedProject.title}</span>
+            <button
+              className="focus-exit-btn"
+              onClick={() => setFocusPersisted(null)}
+              title="Exit focus (Esc)"
+              aria-label="Exit focus"
+            >
+              <X size={12} strokeWidth={2} />
+              Exit focus
+            </button>
+          </div>
+          <div className="focus-stage">
+            <Column {...board} project={focusedProject} allProjects={board.projects} inFocus />
+          </div>
+        </>
+      ) : (
+        <>
       <aside className="app-sidebar">
         <div className="sidebar-head" data-tauri-drag-region>
           <div className="sidebar-brand" data-tauri-drag-region>
@@ -230,11 +282,14 @@ export default function App() {
           projects={filteredProjects}
           onOpen={setOpenProjectId}
           onTrash={board.trashProject}
+          onFocus={setFocusPersisted}
           onReorder={board.reorderProjects}
           reorderDisabled={hasFilters}
         />
       ) : (
-        <Board {...board} projects={filteredProjects} allProjects={board.projects} reorderDisabled={hasFilters} />
+        <Board {...board} projects={filteredProjects} allProjects={board.projects} onFocus={setFocusPersisted} reorderDisabled={hasFilters} />
+      )}
+        </>
       )}
 
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}

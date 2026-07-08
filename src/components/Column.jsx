@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 import { DndContext, closestCenter, useSensor, useSensors, PointerSensor } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Tag, Trash2 } from 'lucide-react'
+import { Tag, Trash2, Focus } from 'lucide-react'
 import Card from './Card'
 import { STATUS_COLORS, STATUS_LABELS } from '../status'
 import { plainText } from '../textUtils'
@@ -241,6 +241,8 @@ export default function Column({
   createTag,
   deleteTag,
   allProjects,
+  onFocus,
+  inFocus,
 }) {
   const [newText, setNewText] = useState('')
   const [adding, setAdding] = useState(false)
@@ -355,6 +357,17 @@ export default function Column({
       {...listeners}
     >
       <div className="col-actions">
+        {!inFocus && (
+          <button
+            className="col-focus-pill"
+            onClick={() => onFocus?.(project.id)}
+            onPointerDown={e => e.stopPropagation()}
+            title="Focus this project"
+            aria-label="Focus this project"
+          >
+            <Focus size={10} strokeWidth={2} />
+          </button>
+        )}
         <button
           className="col-delete-pill"
           onClick={handleDelete}
