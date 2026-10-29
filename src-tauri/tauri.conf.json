@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Surfacer",
   "mainBinaryName": "Surfacer",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "identifier": "com.surfacer.app",
   "build": {
     "beforeDevCommand": "npm run dev",
